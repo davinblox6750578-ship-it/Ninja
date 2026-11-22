@@ -29,6 +29,20 @@ jobs:
           if [ -z "$f" ]; then echo "settings.gradle nao encontrado"; exit 1; fi
           echo "dir=$(dirname "$f")" >> "$GITHUB_OUTPUT"
 
+      - name: Configurar repositorio do Loom
+        working-directory: ${{ steps.p.outputs.dir }}
+        run: |
+          cat > settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  maven { url = 'https://maven.fabricmc.net/' }
+                  gradlePluginPortal()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = 'ninjaclient'
+          EOF
+
       - name: Build
         working-directory: ${{ steps.p.outputs.dir }}
         run: gradle build --no-daemon
