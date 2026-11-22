@@ -10,6 +10,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Descompactar zip
+        run: unzip -o -q ./*.zip || true
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -22,8 +25,9 @@ jobs:
       - name: Achar pasta do projeto
         id: p
         run: |
-          d=$(dirname "$(find . -name settings.gradle -not -path './.git/*' | head -n1)")
-          echo "dir=$d" >> "$GITHUB_OUTPUT"
+          f=$(find . -name settings.gradle -not -path './.git/*' | head -n1)
+          if [ -z "$f" ]; then echo "settings.gradle nao encontrado"; exit 1; fi
+          echo "dir=$(dirname "$f")" >> "$GITHUB_OUTPUT"
 
       - name: Build
         working-directory: ${{ steps.p.outputs.dir }}
